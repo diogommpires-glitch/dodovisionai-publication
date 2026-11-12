@@ -1,0 +1,11 @@
+# DodoVisionAI development and test requirements
+# Install with:
+#   python -m pip install -r requirements.txt -r requirements-dev.txt
+pytest
+pytest-asyncio
+httpx
+# FastAPI test client ships with fastapi>=0.99 but starlette needs:
+anyio
+# For integration test that spawns the server out-of-process
+pytest-timeout
+pip-audit==2.10.1

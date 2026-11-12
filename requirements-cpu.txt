@@ -1,0 +1,8 @@
+# CPU reviewer profile. Python 3.11 or newer.
+--extra-index-url https://download.pytorch.org/whl/cpu
+-r requirements.lock
+onnxruntime==1.23.2
+setuptools==84.1.0
+torch==2.13.0+cpu
+torchaudio==2.11.1+cpu
+torchvision==0.28.0+cpu

@@ -1,0 +1,119 @@
+
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,system-ui,sans-serif;background:#09090b;color:#fafafa;overflow-x:hidden}
+.hdr{display:flex;align-items:center;padding:5px 12px;background:#111;border-bottom:1px solid #27272a;gap:8px;flex-wrap:wrap}
+.logo{font-size:14px;font-weight:800;color:#a855f7}.fps{font-size:10px;color:#52525b;margin-left:auto;font-family:monospace}
+.main{display:flex;gap:6px;padding:6px;justify-content:center;align-items:flex-start;width:100%;flex-wrap:nowrap}
+.vid{position:relative;flex-shrink:0}video{border-radius:6px;background:#000}canvas{position:absolute;top:0;left:0;border-radius:6px;pointer-events:none}
+.panel-l{width:320px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;max-height:calc(100vh - 90px);overflow-y:auto}
+.panel-r{width:340px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;max-height:calc(100vh - 90px);overflow-y:auto}
+.panel::-webkit-scrollbar{width:3px}.panel::-webkit-scrollbar-thumb{background:#27272a;border-radius:2px}
+.card{background:#111;border:1px solid #27272a;border-radius:6px;padding:6px}
+.ct{font-size:10px;font-weight:700;color:#52525b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px}
+.g{display:grid;gap:3px}.g3{grid-template-columns:1fr 1fr 1fr}.g2{grid-template-columns:1fr 1fr}.g4{grid-template-columns:1fr 1fr 1fr 1fr}.g6{grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr}
+.gi{text-align:center;padding:4px 2px;background:#18181b;border-radius:4px}
+.gv{font-family:monospace;font-size:22px;font-weight:700;line-height:1}
+.gl{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.hr-val{font-family:monospace;font-size:30px;font-weight:800;line-height:1}
+#sig{width:100%;height:32px;background:#18181b;border-radius:3px;margin-top:3px}
+.br{margin-bottom:2px}.br-t{display:flex;justify-content:space-between;font-size:9px;color:#71717a}
+.br-k{height:3px;background:#18181b;border-radius:1px;overflow:hidden}.br-f{height:100%;border-radius:1px;transition:width 60ms}
+.emo-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.ai-msg{background:#18181b;border-radius:6px;padding:10px;margin-bottom:4px;border-left:3px solid #a855f7}
+.ai-t{font-size:9px;color:#71717a;font-weight:600}.ai-x{font-size:14px;color:#e4e4e7;line-height:1.5;margin-top:3px}
+.ai-e{color:#52525b;font-size:14px;text-align:center;padding:8px}
+.micro-flash{animation:flash 0.5s}.pose-bar{height:3px;background:#27272a;border-radius:1px;overflow:hidden;margin-top:1px}
+.pose-fill{height:100%;border-radius:1px;transition:width 80ms}
+.dodo-card{background:#111;border:1px solid #27272a;border-radius:6px;padding:10px;margin:0 6px;max-height:280px;overflow-y:auto}
+.btn-row{display:flex;gap:4px;margin-top:4px;justify-content:center;flex-wrap:wrap}
+.btn{padding:7px 14px;font-size:11px;font-weight:800;border-radius:4px;cursor:pointer;border-width:2px;border-style:solid}
+@keyframes flash{0%{background:#ef4444}100%{background:#18181b}}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes startpulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.7);transform:scale(1)}50%{box-shadow:0 0 0 8px rgba(34,197,94,0);transform:scale(1.03)}}
+.start-attention{animation:startpulse 1.4s ease-in-out infinite}
+/* v9.2 plan step 23 — content-visibility auto for off-screen panels.
+ * Chrome / Edge / Opera skip layout + paint for panels not in the
+ * viewport. Fallback to normal rendering on browsers that don't
+ * support the property. */
+#faceCards,#aiHistBody,.panel-r>.card{content-visibility:auto;contain-intrinsic-size:120px}
+/* v9.2 plan step 26 — smooth colour transitions on numeric displays
+ * so colour changes ease rather than snap (number value animates via
+ * the SmoothedNumber JS class; colour animates via CSS). */
+.hr-val,.gv,#oxiHR,#oxiSp,#rHR,#rBR,#rDist,#rHR2,#rBR2,#rDist2,#vcF0,#vcJit,#vcStr,#emo .ai-e{
+    transition:color 180ms ease-out,text-shadow 180ms ease-out;
+    will-change:color;
+}
+/* v9.2 plan step 26 — registered CSS custom properties for numeric
+ * animation on the compositor thread. The SmoothedNumber JS class
+ * provides the same effect cross-browser; Houdini @property gives us
+ * compositor-thread interpolation that can't be paused by main-thread
+ * work. Individual elements opt in via class="anim-num". */
+@property --smooth-val { syntax: '<integer>'; inherits: false; initial-value: 0; }
+.anim-num {
+    transition: --smooth-val 260ms cubic-bezier(0.25, 0.8, 0.25, 1);
+    counter-reset: sv var(--smooth-val);
+}
+/* v9.3 plan step 9 — compositor-thread-only animations + off-screen
+ * skipping. Every moving UI element is transformed/opaque/filtered,
+ * never positioned via top/left/width which force layout. The
+ * `content-visibility: auto` rule skips layout+paint entirely on panels
+ * scrolled out of view and the `contain: layout paint style` rule keeps
+ * each face-tile's work local to its own bounding box. References:
+ *   - web.dev High-Performance Animations (google)
+ *   - web.dev content-visibility (google)
+ *   - Houdini CSS Properties and Values API L1 (W3C) */
+@property --decep {
+    syntax: '<angle>'; inherits: false; initial-value: 0deg;
+}
+@property --valence {
+    syntax: '<number>'; inherits: false; initial-value: 0;
+}
+@property --arousal {
+    syntax: '<number>'; inherits: false; initial-value: 0;
+}
+.decep-arc {
+    background: conic-gradient(from -90deg, hsl(120 70% 50%) 0deg, hsl(0 70% 55%) var(--decep), #27272a 0deg);
+    transition: --decep 220ms cubic-bezier(.25,.8,.25,1);
+    will-change: --decep;
+}
+.face-tile {
+    contain: layout paint style;
+    content-visibility: auto;
+    contain-intrinsic-size: 320px 420px;
+}
+.card { contain: layout style; }
+/* Keep will-change scoped to actively animating nodes only — removing it
+ * when idle is important; otherwise the GPU backing store leaks VRAM.
+ * We attach/detach will-change via JS in the LatencyHUD's idle callback. */
+.lat-hud { contain: strict; content-visibility: auto; contain-intrinsic-size: 320px 220px; }
+/* Step 9 — move the scrolling EKG + breath widgets to transform-only
+ * animation. translate3d forces GPU compositing; translateX alone lands
+ * on the main thread on some engines. */
+.ekg-sweep { transform: translate3d(var(--ekg-x, 0), 0, 0); }
+.br-fill  { transform: scaleX(var(--br-fill, 0)); transform-origin: left center; }
+/* v9.4.1 step 5 — SPOOF-mask hatch pattern. Applied to HR / deception /
+ * LLM pills when the person's PAD verdict is SPOOF and the hysteresis
+ * gate (>=50% SPOOF in last 6 frames) is met. Values remain server-side
+ * for forensic audit; the operator just can't read them directly. */
+.pad-spoof-mask {
+    position: relative;
+    overflow: hidden;
+}
+.pad-spoof-mask::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(239, 68, 68, 0.55) 0 6px,
+        rgba(24, 24, 27, 0.85) 6px 12px
+    );
+    pointer-events: none;
+    border-radius: inherit;
+}
+.pad-spoof-mask[data-pad-label]::before {
+    content: attr(data-pad-label);
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fef2f2; font-weight: 800; font-size: 10px;
+    letter-spacing: 1px; z-index: 2;
+}
+

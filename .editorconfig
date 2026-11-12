@@ -1,0 +1,61 @@
+# .editorconfig -- cross-editor consistency
+# https://editorconfig.org/
+
+root = true
+
+# ── Defaults ─────────────────────────────────────────────
+[*]
+end_of_line             = lf
+insert_final_newline    = true
+trim_trailing_whitespace = true
+charset                 = utf-8
+indent_style            = space
+indent_size             = 4
+
+# ── Python ───────────────────────────────────────────────
+[*.py]
+indent_size             = 4
+max_line_length         = 100     # our ruff rule
+
+# ── Shell scripts ────────────────────────────────────────
+[*.sh]
+indent_size             = 4
+end_of_line             = lf
+
+# ── Windows batch + cmd: CRITICAL -- must be CRLF ────────
+[*.{cmd,bat}]
+end_of_line             = crlf
+indent_size             = 4
+indent_style            = space
+trim_trailing_whitespace = true
+
+# ── PowerShell ───────────────────────────────────────────
+[*.ps1]
+end_of_line             = crlf
+indent_size             = 4
+
+# ── Markdown -- trailing whitespace is intentional (line breaks) ──
+[*.md]
+trim_trailing_whitespace = false
+max_line_length         = off
+
+# ── YAML (CI / pre-commit) ───────────────────────────────
+[*.{yml,yaml}]
+indent_size             = 2
+
+# ── JSON ─────────────────────────────────────────────────
+[*.json]
+indent_size             = 2
+
+# ── TOML (pyproject.toml if we ever add one) ─────────────
+[*.toml]
+indent_size             = 4
+
+# ── Makefile -- tabs are mandatory ───────────────────────
+[Makefile]
+indent_style            = tab
+
+# ── LaTeX (paper drafts) ─────────────────────────────────
+[*.tex]
+indent_size             = 2
+max_line_length         = 80

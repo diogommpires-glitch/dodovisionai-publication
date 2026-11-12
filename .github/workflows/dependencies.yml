@@ -1,0 +1,52 @@
+name: Dependency checks
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  cpu:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+      - name: Install the CPU profile
+        run: python -m pip install -r requirements-cpu.txt -r requirements-dev.txt
+      - name: Check installed dependency metadata
+        run: python -m pip check
+      - name: Audit the CPU profile packages indexed on PyPI
+        run: python -m pip_audit --no-deps --disable-pip -r requirements-cpu.txt
+      - name: Exercise offline public tests
+        run: >-
+          python -m pytest tests/test_security_boundaries.py
+          tests/test_dependency_compatibility.py
+          pad/tests/test_fusion_math_c1.py pad/tests/test_fusion.py
+          pad/tests/test_metrics_iso30107.py pad/tests/test_defense.py
+          pad/tests/test_dynamics_multi_pid.py -q -p no:cacheprovider
+  pad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+      - name: Select the patched CPU Torch family
+        run: >-
+          python -m pip install torch==2.13.0+cpu torchvision==0.28.0+cpu
+          torchaudio==2.11.1+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Install PAD research and export dependencies
+        run: python -m pip install -r pad/requirements.txt -r requirements-dev.txt
+      - name: Check installed dependency metadata
+        run: python -m pip check
+      - name: Exercise the foundation PAD adapter without downloads
+        run: python -m pytest tests/test_transformers_compatibility.py -q

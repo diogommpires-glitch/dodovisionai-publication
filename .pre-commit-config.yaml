@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+  - repo: local
+    hooks:
+      - id: offline-regressions
+        name: offline synthetic regressions
+        entry: python -m pytest -q -p no:cacheprovider
+        language: system
+        types: [python]
+        pass_filenames: false
