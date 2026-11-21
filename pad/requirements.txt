@@ -1,0 +1,40 @@
+# --- core ---
+numpy>=1.24,<2.2
+scipy>=1.11
+scikit-learn>=1.3
+pillow>=13.0.0
+opencv-python>=4.8
+tqdm>=4.66
+
+# --- torch stack (CPU or CUDA; install matching wheel from pytorch.org if GPU) ---
+torch==2.13.0
+torchvision==0.28.0
+torchaudio==2.11.1
+
+# --- ONNX runtime (for loading .onnx detectors) ---
+onnx>=1.15
+onnxscript>=0.7,<1
+onnxconverter-common>=1.16
+onnxruntime>=1.17        # swap for onnxruntime-gpu if you want CUDA EP
+
+# --- hugging face ---
+huggingface_hub>=1.5.0,<2
+transformers>=5.10.1,<5.11
+filelock>=4.2.1
+safetensors>=0.4
+
+# --- face / landmarks / 3DMM ---
+face-alignment>=1.4.1    # bundles FAN + 3DMM basis
+scikit-image>=0.22
+
+# --- audio PAD ---
+librosa>=0.10
+soundfile>=0.12
+
+# --- moire GBT ---
+lightgbm>=4.1            # or xgboost if you prefer; code below uses lightgbm
+joblib>=1.3
+
+# --- quality of life ---
+requests>=2.31
+pyyaml>=6.0

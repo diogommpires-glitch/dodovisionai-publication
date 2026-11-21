@@ -1,0 +1,62 @@
+# .dockerignore -- keep the image slim
+
+# Git + dev artefacts
+.git
+.gitignore
+.vscode
+.idea
+.venv*/
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+.mypy_cache
+
+# Secrets
+.env
+*.secret
+*.key
+*.pem
+
+# Local caches + workspace scratch
+.pad_stage
+logs/
+sessions/replay/
+.cache/
+
+# Backups + archive (we ship the current state, not history)
+**/*.bak_*
+queue/mega/queue.log
+queue/full_calib/*.done
+queue/calib_sprint/*.done
+queue/master/*.done
+queue/audio_robo/
+queue/temporal_deepfake/
+
+# Large training data -- must be mounted at runtime via -v
+E:/
+pad_datasets/
+**/video_clips_*
+**/patch_depth_mmap
+
+# Reports that the user can regenerate
+reports/archive/
+reports/figures/*.pdf
+
+# Build outputs
+build/
+dist/
+*.egg-info/
+
+# OneDrive metadata (Windows-specific noise)
+*.~OFF
+~$*
+
+# Node / web dev (we don't use these)
+node_modules/
+package-lock.json
+
+# Docs that don't belong in the image
+docs/archive/
+HARDWARE_*.md
+HARDWARE_LINKS.md

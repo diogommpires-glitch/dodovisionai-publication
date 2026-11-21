@@ -1,0 +1,2 @@
+# CPU-only offline verification profile. Python 3.11.
+-r requirements-cpu.txt
